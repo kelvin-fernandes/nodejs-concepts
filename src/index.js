@@ -22,6 +22,21 @@ function checksExistsUserAccount(request, response, next) {
   request.user = user;
 
   return next();
+};
+
+function checksExistingTodo(request, response, next) {
+  const { user } = request;
+  const { id } = request.params;
+
+  const todo = user.todos.find((lambdaTodo) => lambdaTodo.id === id);
+
+  if(!todo) {
+    return response.status(404).json({error: "Todo not found!"});
+  }
+
+  request.todo = todo;
+
+  return next();
 }
 
 app.post('/users', (request, response) => {
@@ -68,8 +83,14 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
   return response.status(201).json(todo);
 });
 
-app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+app.put('/todos/:id', checksExistsUserAccount, checksExistingTodo, (request, response) => {
+  const { user, todo } = request;
+  const { title, deadline } = request.body;
+
+  todo.title = title;
+  todo.deadline = new Date(deadline);
+
+  return response.json(todo);
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
