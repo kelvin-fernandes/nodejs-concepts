@@ -84,7 +84,7 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 });
 
 app.put('/todos/:id', checksExistsUserAccount, checksExistingTodo, (request, response) => {
-  const { user, todo } = request;
+  const { todo } = request;
   const { title, deadline } = request.body;
 
   todo.title = title;
@@ -93,8 +93,12 @@ app.put('/todos/:id', checksExistsUserAccount, checksExistingTodo, (request, res
   return response.json(todo);
 });
 
-app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+app.patch('/todos/:id/done', checksExistsUserAccount, checksExistingTodo, (request, response) => {
+  const { todo } = request;
+
+  todo.done = true;
+
+  return response.json(todo);
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
